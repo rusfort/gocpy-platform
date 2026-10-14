@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"sync"
+	"std/sync"
+    gosync "sync"
 	"sync/atomic"
 
 	"github.com/rusfort/gocpy-platform/highway"
@@ -94,7 +95,7 @@ type egFunction interface {
 // threader is a controller of all threads of a specific type
 type threader[F egFunction] struct {
 	nextID  atomic.Int64
-	exexMap sync.Map
+	exexMap gosync.Map
 }
 
 // GetFunctionType is a way to recognise a type of egFunction
