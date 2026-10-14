@@ -1,0 +1,9 @@
+package exception
+
+import "github.com/rusfort/gocpy-platform/types"
+
+func Ignore[F types.Function](operation F){
+    try {
+        operation()
+    } catch _ {}
+}

@@ -1,0 +1,17 @@
+package types
+
+type (
+    BasicFunction func(params ...any)
+    BasicThrowsFunction @throws func(params ...any)
+    ErrorFunction func(params ...any) error
+    ErrorThrowsFunction @throws func(params ...any) error
+    ResultFunction func(params ...any) (any, error)
+    ResultThrowsFunction @throws func(params ...any) (any, error)
+)
+
+// Function stands for any Gocpy function
+type Function interface{
+    ~func(params ...any) | ~@throws func(params ...any) |
+    ~func(params ...any) error | ~@throws func(params ...any) error |
+    ~func(params ...any) (any, error) | ~@throws func(params ...any) (any, error)
+}

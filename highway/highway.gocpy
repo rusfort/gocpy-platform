@@ -1,0 +1,18 @@
+package highway
+
+import h "./highway.go"
+
+@overload
+func GetReflectType(obj any) string{
+    return h.GetReflectType(obj)
+}
+
+@overload
+func GetReflectType(instancer func()any) string{
+    return GetReflectType(instancer())
+}
+
+func Instance[T any]() T {
+    var instance T
+    return instance
+}
