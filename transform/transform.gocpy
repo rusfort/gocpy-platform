@@ -1,0 +1,15 @@
+package transform
+
+func Transform[T any](from any) T {
+    to, ok := from.(T)
+    if !ok {
+        var zero T
+        return zero
+    }
+
+    return to
+}
+
+func TransformSlice[T any](from []any) []T {
+    return [Transform(f) for f in from]
+}

@@ -3,15 +3,22 @@ package types
 type (
     BasicFunction func(params ...any)
     BasicThrowsFunction @throws func(params ...any)
+    BasicResultFunction func(params ...any) any
+    BasicResultThrowsFunction @throws func(params ...any) any
     ErrorFunction func(params ...any) error
     ErrorThrowsFunction @throws func(params ...any) error
-    ResultFunction func(params ...any) (any, error)
-    ResultThrowsFunction @throws func(params ...any) (any, error)
+    ResultErrorFunction func(params ...any) (any, error)
+    ResultErrorThrowsFunction @throws func(params ...any) (any, error)
 )
 
 // Function stands for any Gocpy function
 type Function interface{
+    ~func() | ~@throws func() |
+    ~func() any | ~@throws func() any |
+    ~func() error | ~@throws func() error |
+    ~func() (any, error) | ~@throws func() (any, error) |
     ~func(params ...any) | ~@throws func(params ...any) |
+    ~func(params ...any) any | ~@throws func(params ...any) any |
     ~func(params ...any) error | ~@throws func(params ...any) error |
     ~func(params ...any) (any, error) | ~@throws func(params ...any) (any, error)
 }

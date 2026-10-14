@@ -5,10 +5,10 @@ import (
 	"log"
 	"strings"
 	"std/sync"
-    gosync "sync"
 	"sync/atomic"
 
 	"github.com/rusfort/gocpy-platform/highway"
+	"github.com/rusfort/gocpy-platform/types"
 )
 
 const (
@@ -30,7 +30,7 @@ type threadCore struct {
 var thc threadCore
 
 @throws
-func createNewThreadInCore[F egFunction](tc *threadCore, op F) *Thread[F] {
+func createNewThreadInCore[F types.Function](tc *threadCore, op F) *Thread[F] {
 	tc.mtx.Lock()
 	defer tc.mtx.Unlock()
 
@@ -59,7 +59,7 @@ func createNewThreadInCore[F egFunction](tc *threadCore, op F) *Thread[F] {
 }
 
 @throws
-func getThreaderFromCore[F egFunction](tc *threadCore) *threader[F] {
+func getThreaderFromCore[F types.Function](tc *threadCore) *threader[F] {
 	tc.mtx.Lock()
 	defer tc.mtx.Unlock()
 
@@ -88,14 +88,14 @@ const (
 )
 
 // egFunction stands for an abstraction of any golang func possible
-type egFunction interface {
-	~func() | ~func() any | ~func() (any, error)
-}
+// type egFunction interface {
+// 	~func() | ~func() any | ~func() (any, error)
+// }
 
 // threader is a controller of all threads of a specific type
-type threader[F egFunction] struct {
+type threader[F types.Function] struct {
 	nextID  atomic.Int64
-	exexMap gosync.Map
+	exexMap types.Map[int, bool]
 }
 
 // GetFunctionType is a way to recognise a type of egFunction
@@ -123,7 +123,7 @@ func (tr *threader[F]) CreateNew(routine F) *Thread[F] {
 // IsThreadExecuted returns an execution status of a thread inside a threader
 func (tr *threader[F]) IsThreadExecuted(position int) bool {
 	v, ok := tr.exexMap.Load(position)
-	return !ok || v.(bool)
+	return !ok || v
 }
 
 // SetThreadExecuted tells threader about a successful execution
@@ -134,7 +134,7 @@ func (tr *threader[F]) SetThreadExecuted(position int) {
 //-----
 
 // Thread is a base entity of easy-go lib - it works the similar way as threads in other languages
-type Thread[F egFunction] struct {
+type Thread[F types.Function] struct {
 	position       int
 	previous, next *Thread[F]
 	routine        F
@@ -143,7 +143,7 @@ type Thread[F egFunction] struct {
 }
 
 // NewThread creates new Thread for one of the egFunction
-func NewThread[F egFunction](routine F) *Thread[F] {
+func NewThread[F types.Function](routine F) *Thread[F] {
 	try {
         t := newThread[F](routine)
         return t
@@ -161,7 +161,7 @@ func NewBasicThread(routine func()) *Thread[func() any] {
 }
 
 @throws
-func newThread[F egFunction](routine F) *Thread[F] {
+func newThread[F types.Function](routine F) *Thread[F] {
 	return createNewThreadInCore[F](&thc, routine)
 }
 
@@ -340,7 +340,7 @@ func (t *Thread[F]) Run() {
 //-----
 
 // WaitConcurrentExec runs all of the given threads concurrently and waits till all of them finish
-func WaitConcurrentExec[F egFunction](threads ...*Thread[F]) {
+func WaitConcurrentExec[F types.Function](threads ...*Thread[F]) {
 	wg := sync.WaitGroup{}
 	wg.Add(len(threads))
 
@@ -356,8 +356,8 @@ func WaitConcurrentExec[F egFunction](threads ...*Thread[F]) {
 }
 
 // WorkThreads is the same as WaitConcurrentExec but returns a Slice of results (if a Thread type provides a threadResult)
-func WorkThreads[F egFunction](threads ...*Thread[F]) *Slice {
-	result := NewSlice()
+func WorkThreads[F types.Function](threads ...*Thread[F]) *types.Slice[any] {
+	result := types.NewSlice[any]()
 	if len(threads) == 0 {
 		return result
 	}

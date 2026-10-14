@@ -1,0 +1,39 @@
+package types
+
+import (
+    "std/sync"
+)
+
+type Map[K comparable, V any] struct {
+    mtx sync.Mutex
+    m map[K]V
+}
+
+func SyncMap[K comparable, V any](capacity ...int) *Map[K, V]{
+    c := 0
+    if len(capacity) > 0 {
+        c = capacity[0]
+    }
+    return &Map{
+        m: make(map[K]V, c)
+    }
+}
+
+func (sm *Map[K, V]) Store(key K, value V){
+    sm.mtx.Lock()
+    defer sm.mtx.Unlock()
+    sm.m[key] = value
+}
+
+func (sm *Map[K, V]) Load(key K) (V, bool){
+    sm.mtx.Lock()
+    defer sm.mtx.Unlock()
+    value, ok := sm.m[key]
+    return value, ok
+}
+
+func (sm *Map[K, V]) Delete(key K){
+    sm.mtx.Lock()
+    defer sm.mtx.Unlock()
+    delete(sm.m, key)
+}
