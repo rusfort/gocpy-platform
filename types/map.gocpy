@@ -14,7 +14,7 @@ func SyncMap[K comparable, V any](capacity ...int) *Map[K, V]{
     if len(capacity) > 0 {
         c = capacity[0]
     }
-    return &Map{
+    return &Map[K, V]{
         m: make(map[K]V, c)
     }
 }
