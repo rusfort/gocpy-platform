@@ -9,14 +9,20 @@ type Map[K comparable, V any] struct {
     m map[K]V
 }
 
-func SyncMap[K comparable, V any](capacity ...int) *Map[K, V]{
+func SyncMap[K comparable, V any](capacity ...int) Map[K, V]{
     c := 0
     if len(capacity) > 0 {
         c = capacity[0]
     }
-    return &Map[K, V]{
+    return Map[K, V]{
         m: make(map[K]V, c)
     }
+}
+
+func (sm *Map[K, V]) Nil() bool{
+    sm.mtx.Lock()
+    defer sm.mtx.Unlock()
+    return sm.m == nil
 }
 
 func (sm *Map[K, V]) Store(key K, value V){

@@ -95,7 +95,7 @@ const (
 // threader is a controller of all threads of a specific type
 type threader[F types.Function] struct {
 	nextID  atomic.Int64
-	exexMap *types.Map[int, bool]
+	exexMap types.Map[int, bool]
 }
 
 // GetFunctionType is a way to recognise a type of egFunction
@@ -116,7 +116,7 @@ func GetFunctionType(f any) int {
 func (tr *threader[F]) CreateNew(routine F) *Thread[F] {
 	pos := int(tr.nextID.Add(1) - 1)
 	t := &Thread[F]{position: pos, routine: routine}
-    if tr.exexMap == nil {
+    if tr.exexMap.Nil() {
         tr.exexMap = types.SyncMap[int, bool]()
     }
 	tr.exexMap.Store(pos, false)
